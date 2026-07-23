@@ -1,0 +1,61 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { supabase } from '../../lib/supabase'
+import { TopBar } from '../../components/TopBar'
+import type { Pratica } from '../../types/pratica'
+import { STATO_LABELS } from '../../types/pratica'
+
+type Row = Pick<Pratica, 'id' | 'cognome' | 'nome' | 'stato' | 'created_at'>
+
+export function PartnerDashboard() {
+  const [pratiche, setPratiche] = useState<Row[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase
+      .from('pratiche')
+      .select('id, cognome, nome, stato, created_at')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setPratiche(data ?? [])
+        setLoading(false)
+      })
+  }, [])
+
+  return (
+    <div>
+      <TopBar title="Pratiche ENEA — Area partner" />
+      <div className="p-6 space-y-4">
+        <h2 className="text-lg font-semibold">Le tue pratiche</h2>
+        {loading ? (
+          <p className="text-sm text-gray-500">Caricamento...</p>
+        ) : pratiche.length === 0 ? (
+          <p className="text-sm text-gray-500">Nessuna pratica ancora.</p>
+        ) : (
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="text-left border-b border-gray-200 dark:border-gray-700">
+                <th className="py-2 pr-4">Cliente</th>
+                <th className="py-2 pr-4">Stato</th>
+                <th className="py-2 pr-4">Creata il</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pratiche.map((p) => (
+                <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
+                  <td className="py-2 pr-4">
+                    <Link to={`/partner/pratiche/${p.id}`} className="text-brand-700 hover:underline">
+                      {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
+                    </Link>
+                  </td>
+                  <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
+                  <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
+}

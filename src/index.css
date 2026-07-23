@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #eefbf2;
+  --color-brand-100: #def8e6;
+  --color-brand-200: #bcf0cc;
+  --color-brand-300: #8ae5a6;
+  --color-brand-400: #50d879;
+  --color-brand-500: #28b553;
+  --color-brand-600: #219444;
+  --color-brand-700: #197033;
+  --color-brand-800: #125125;
+  --color-brand-900: #0d3a1b;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
