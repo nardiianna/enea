@@ -5,7 +5,6 @@ import { TopBar } from '../../components/TopBar'
 import { Pallino } from '../../components/Pallino'
 import { getColorePallino } from '../../lib/pallino'
 import type { AziendaPartner, Pratica } from '../../types/pratica'
-import { STATO_LABELS } from '../../types/pratica'
 import { useAuth } from '../../hooks/useAuth'
 
 type Row = Pick<
@@ -105,7 +104,6 @@ export function AdminAziendaDetail() {
               <tr className="text-left border-b border-gray-200 dark:border-gray-700">
                 <th className="py-2 pr-4">Cliente</th>
                 <th className="py-2 pr-4">Stato</th>
-                <th className="py-2 pr-4">ENEA</th>
                 <th className="py-2 pr-4">Visibile azienda</th>
                 <th className="py-2 pr-4">Creata il</th>
               </tr>
@@ -118,7 +116,6 @@ export function AdminAziendaDetail() {
                       {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
                     </Link>
                   </td>
-                  <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
                   <td className="py-2 pr-4">
                     <Pallino
                       colore={getColorePallino(p)}
