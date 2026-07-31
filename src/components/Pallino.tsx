@@ -14,11 +14,11 @@ const LABEL: Record<ColorePallino, string> = {
   bianco: 'Nessuna segnalazione',
 }
 
-export function Pallino({ colore }: { colore: ColorePallino }) {
-  return (
-    <span
-      title={LABEL[colore]}
-      className={`inline-block w-2.5 h-2.5 rounded-full shrink-0 ${CLASSI[colore]}`}
-    />
-  )
+export function Pallino({ colore, onClick }: { colore: ColorePallino; onClick?: () => void }) {
+  const className = `inline-block w-3.5 h-3.5 rounded-full shrink-0 ${CLASSI[colore]}`
+
+  if (onClick) {
+    return <button type="button" title={LABEL[colore]} onClick={onClick} className={className} />
+  }
+  return <span title={LABEL[colore]} className={className} />
 }

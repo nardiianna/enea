@@ -88,20 +88,16 @@ export function AdminDashboard() {
               {pratiche.map((p) => (
                 <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
                   <td className="py-2 pr-4">
-                    <div className="flex items-center gap-2">
-                      <Pallino colore={getColorePallino(p)} />
-                      <Link to={`/admin/pratiche/${p.id}`} className="text-brand-700 hover:underline">
-                        {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
-                      </Link>
-                    </div>
+                    <Link to={`/admin/pratiche/${p.id}`} className="text-brand-700 hover:underline">
+                      {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
+                    </Link>
                   </td>
                   <td className="py-2 pr-4">{aziendaNome(p.azienda_partner_id)}</td>
                   <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
                   <td className="py-2 pr-4">
-                    <input
-                      type="checkbox"
-                      checked={p.inserita_enea}
-                      onChange={(e) => handleFlagChange(p.id, 'inserita_enea', e.target.checked)}
+                    <Pallino
+                      colore={getColorePallino(p)}
+                      onClick={() => handleFlagChange(p.id, 'inserita_enea', !p.inserita_enea)}
                     />
                   </td>
                   <td className="py-2 pr-4">
