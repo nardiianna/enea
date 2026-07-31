@@ -9,6 +9,7 @@ interface Props {
 
 export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
   const [uploading, setUploading] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -50,7 +51,23 @@ export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
   const filename = path?.split('/').pop()?.replace(/^\d+-/, '')
 
   return (
-    <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+    <div
+      onDragOver={(e) => {
+        e.preventDefault()
+        setDragActive(true)
+      }}
+      onDragLeave={() => setDragActive(false)}
+      onDrop={(e) => {
+        e.preventDefault()
+        setDragActive(false)
+        handleUpload(e.dataTransfer.files)
+      }}
+      className={`rounded border p-4 space-y-3 transition-colors ${
+        dragActive
+          ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20'
+          : 'border-gray-200 dark:border-gray-700'
+      }`}
+    >
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Pratica finale</h3>
         {!path && (
@@ -79,7 +96,7 @@ export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
           </button>
         </div>
       ) : (
-        <p className="text-sm text-gray-500">Nessuna pratica finale allegata ancora.</p>
+        <p className="text-sm text-gray-500">Nessuna pratica finale allegata ancora. Trascina qui il file o usa il bottone.</p>
       )}
     </div>
   )

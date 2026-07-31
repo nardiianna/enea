@@ -11,6 +11,7 @@ export function FileManager({ praticaId }: { praticaId: string }) {
   const [files, setFiles] = useState<FileRow[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -51,7 +52,23 @@ export function FileManager({ praticaId }: { praticaId: string }) {
   }
 
   return (
-    <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+    <div
+      onDragOver={(e) => {
+        e.preventDefault()
+        setDragActive(true)
+      }}
+      onDragLeave={() => setDragActive(false)}
+      onDrop={(e) => {
+        e.preventDefault()
+        setDragActive(false)
+        handleUpload(e.dataTransfer.files)
+      }}
+      className={`rounded border p-4 space-y-3 transition-colors ${
+        dragActive
+          ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20'
+          : 'border-gray-200 dark:border-gray-700'
+      }`}
+    >
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Fatture e documenti</h3>
         <label className="rounded bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 text-xs font-medium cursor-pointer">
@@ -72,7 +89,7 @@ export function FileManager({ praticaId }: { praticaId: string }) {
       {loading ? (
         <p className="text-sm text-gray-500">Caricamento...</p>
       ) : files.length === 0 ? (
-        <p className="text-sm text-gray-500">Nessun file caricato ancora.</p>
+        <p className="text-sm text-gray-500">Nessun file caricato ancora. Trascina qui i file o usa il bottone.</p>
       ) : (
         <ul className="divide-y divide-gray-100 dark:divide-gray-800">
           {files.map((f) => (
