@@ -150,6 +150,8 @@ export interface Pratica {
   note_cliente: string | null
   inserita_enea: boolean
   visibile_azienda: boolean
+  problema: boolean
+  pratica_finale_path: string | null
   created_by: string | null
   created_at: string
   updated_at: string

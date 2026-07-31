@@ -2,11 +2,25 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
+import { Pallino } from '../../components/Pallino'
+import { getColorePallino } from '../../lib/pallino'
 import type { AziendaPartner, Pratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
 import { useAuth } from '../../hooks/useAuth'
 
-type Row = Pick<Pratica, 'id' | 'cognome' | 'nome' | 'stato' | 'created_at' | 'inserita_enea' | 'visibile_azienda'>
+type Row = Pick<
+  Pratica,
+  | 'id'
+  | 'cognome'
+  | 'nome'
+  | 'stato'
+  | 'created_at'
+  | 'inserita_enea'
+  | 'visibile_azienda'
+  | 'problema'
+  | 'pratica_finale_path'
+  | 'tipo_lavoro'
+>
 
 export function AdminAziendaDetail() {
   const { id } = useParams<{ id: string }>()
@@ -25,7 +39,9 @@ export function AdminAziendaDetail() {
         supabase.from('aziende_partner').select('id, nome').eq('id', id).single(),
         supabase
           .from('pratiche')
-          .select('id, cognome, nome, stato, created_at, inserita_enea, visibile_azienda')
+          .select(
+            'id, cognome, nome, stato, created_at, inserita_enea, visibile_azienda, problema, pratica_finale_path, tipo_lavoro',
+          )
           .eq('azienda_partner_id', id)
           .order('created_at', { ascending: false }),
       ])
@@ -99,9 +115,12 @@ export function AdminAziendaDetail() {
               {pratiche.map((p) => (
                 <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
                   <td className="py-2 pr-4">
-                    <Link to={`/admin/pratiche/${p.id}`} className="text-brand-700 hover:underline">
-                      {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Pallino colore={getColorePallino(p)} />
+                      <Link to={`/admin/pratiche/${p.id}`} className="text-brand-700 hover:underline">
+                        {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
+                      </Link>
+                    </div>
                   </td>
                   <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
                   <td className="py-2 pr-4">

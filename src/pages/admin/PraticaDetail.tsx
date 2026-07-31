@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
 import { FileManager } from '../../components/FileManager'
+import { PraticaFinaleUpload } from '../../components/PraticaFinaleUpload'
 import { PraticaForm, type PraticaFormValue } from '../../components/form/PraticaForm'
 import type { AziendaPartner, Pratica, StatoPratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
@@ -81,7 +82,7 @@ export function PraticaDetail() {
     if (!isNew && id) await supabase.from('pratiche').update({ stato }).eq('id', id)
   }
 
-  async function handleFlagChange(field: 'inserita_enea' | 'visibile_azienda', checked: boolean) {
+  async function handleFlagChange(field: 'inserita_enea' | 'visibile_azienda' | 'problema', checked: boolean) {
     setValue((v) => ({ ...v, [field]: checked }))
     if (!isNew && id) await supabase.from('pratiche').update({ [field]: checked }).eq('id', id)
   }
@@ -142,6 +143,14 @@ export function PraticaDetail() {
 
         {!isNew && id && <FileManager praticaId={id} />}
 
+        {!isNew && id && (
+          <PraticaFinaleUpload
+            praticaId={id}
+            path={value.pratica_finale_path ?? null}
+            onChange={(path) => setValue((v) => ({ ...v, pratica_finale_path: path }))}
+          />
+        )}
+
         {!isNew && (
           <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -192,6 +201,14 @@ export function PraticaDetail() {
                   onChange={(e) => handleFlagChange('visibile_azienda', e.target.checked)}
                 />
                 Visibile all'azienda partner
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={value.problema ?? false}
+                  onChange={(e) => handleFlagChange('problema', e.target.checked)}
+                />
+                C'è un problema
               </label>
             </div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
