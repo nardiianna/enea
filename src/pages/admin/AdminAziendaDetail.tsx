@@ -19,7 +19,6 @@ type Row = Pick<
   | 'visibile_azienda'
   | 'problema'
   | 'pratica_finale_path'
-  | 'tipo_lavoro'
 >
 
 export function AdminAziendaDetail() {
@@ -40,7 +39,7 @@ export function AdminAziendaDetail() {
         supabase
           .from('pratiche')
           .select(
-            'id, cognome, nome, stato, created_at, inserita_enea, visibile_azienda, problema, pratica_finale_path, tipo_lavoro',
+            'id, cognome, nome, stato, created_at, inserita_enea, visibile_azienda, problema, pratica_finale_path',
           )
           .eq('azienda_partner_id', id)
           .order('created_at', { ascending: false }),

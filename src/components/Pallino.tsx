@@ -9,7 +9,7 @@ const CLASSI: Record<ColorePallino, string> = {
 
 const LABEL: Record<ColorePallino, string> = {
   rosso: 'Problema segnalato',
-  giallo: 'Pratica compilata — manca comunicazione a ENEA',
+  giallo: 'Cliente contattato',
   verde: 'Pratica finale allegata',
   bianco: 'Nessuna segnalazione',
 }
