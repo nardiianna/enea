@@ -192,7 +192,7 @@ export function PraticaDetail() {
                   checked={value.inserita_enea ?? false}
                   onChange={(e) => handleFlagChange('inserita_enea', e.target.checked)}
                 />
-                Inserita nel portale ENEA
+                Cliente contattato
               </label>
               <label className="flex items-center gap-2 text-sm">
                 <input
@@ -200,7 +200,7 @@ export function PraticaDetail() {
                   checked={value.visibile_azienda ?? false}
                   onChange={(e) => handleFlagChange('visibile_azienda', e.target.checked)}
                 />
-                Visibile all'azienda partner
+                Pratica Enea compilata
               </label>
               <label className="flex items-center gap-2 text-sm">
                 <input
