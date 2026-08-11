@@ -26,7 +26,7 @@ export function LoginForm({ title, redirectTo }: { title: string; redirectTo: st
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 rounded border border-gray-200 dark:border-gray-700 p-6">
-        <img src={logo} alt="Pratiche ENEA — Nardi's" className="mx-auto w-48" />
+        <img src={logo} alt="Pratiche ENEA — Nardi" className="mx-auto w-48" />
         <h1 className="text-lg font-semibold text-center">{title}</h1>
         <input
           type="email"

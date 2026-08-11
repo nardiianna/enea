@@ -15,7 +15,7 @@ import logo from './assets/logo-full.png'
 function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-8 px-6 bg-gray-50 dark:bg-gray-950">
-      <img src={logo} alt="Pratiche ENEA — Nardi's" className="w-full max-w-xs" />
+      <img src={logo} alt="Pratiche ENEA — Nardi" className="w-full max-w-xs" />
       <div className="w-full max-w-xs flex flex-col gap-4">
         <Link
           to="/admin"
