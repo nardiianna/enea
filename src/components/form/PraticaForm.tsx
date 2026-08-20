@@ -23,6 +23,7 @@ export function PraticaForm({
   editableMeta,
   disabled,
   showBonifico = true,
+  basicOnly = false,
 }: {
   value: PraticaFormValue
   onChange: (patch: PraticaFormValue) => void
@@ -30,6 +31,7 @@ export function PraticaForm({
   editableMeta: boolean
   disabled?: boolean
   showBonifico?: boolean
+  basicOnly?: boolean
 }) {
   const tipoLavoro = value.tipo_lavoro ?? []
 
@@ -99,6 +101,8 @@ export function PraticaForm({
         <TextInput label="Lavori presso (indirizzo intervento)" value={value.lavori_presso} disabled={disabled} onChange={(v) => onChange({ lavori_presso: v })} />
       </Section>
 
+      {!basicOnly && (
+      <>
       <Section title="Diritti sull'immobile">
         <BoolRadio
           label="È abitazione principale?"
@@ -383,6 +387,8 @@ export function PraticaForm({
           />
         </label>
       </div>
+      </>
+      )}
     </div>
   )
 }
