@@ -44,6 +44,19 @@ export function PraticaForm({
 
   return (
     <div className="space-y-6">
+      <Section title="Dati anagrafici">
+        <TextInput label="Cognome" value={value.cognome} disabled={disabled} onChange={(v) => onChange({ cognome: v })} />
+        <TextInput label="Nome" value={value.nome} disabled={disabled} onChange={(v) => onChange({ nome: v })} />
+        <TextInput label="Telefono" value={value.telefono} disabled={disabled} onChange={(v) => onChange({ telefono: v })} />
+        <DateOfBirthInput value={value.data_nascita} disabled={disabled} onChange={(v) => onChange({ data_nascita: v })} />
+        <TextInput label="Luogo di nascita" value={value.luogo_nascita} disabled={disabled} onChange={(v) => onChange({ luogo_nascita: v })} />
+        <TextInput label="Stato" value={value.stato_nascita} disabled={disabled} onChange={(v) => onChange({ stato_nascita: v })} />
+        <TextInput label="Regione" value={value.regione_nascita} disabled={disabled} onChange={(v) => onChange({ regione_nascita: v })} />
+        <TextInput label="Provincia" value={value.provincia_nascita} disabled={disabled} onChange={(v) => onChange({ provincia_nascita: v })} />
+        <TextInput label="Residenza" value={value.residenza} disabled={disabled} onChange={(v) => onChange({ residenza: v })} />
+        <TextInput label="Lavori presso (indirizzo intervento)" value={value.lavori_presso} disabled={disabled} onChange={(v) => onChange({ lavori_presso: v })} />
+      </Section>
+
       <Section title="Azienda e tipo di lavoro">
         {editableMeta ? (
           <SelectInput
@@ -86,19 +99,6 @@ export function PraticaForm({
             ))}
           </div>
         </div>
-      </Section>
-
-      <Section title="Dati anagrafici">
-        <TextInput label="Cognome" value={value.cognome} disabled={disabled} onChange={(v) => onChange({ cognome: v })} />
-        <TextInput label="Nome" value={value.nome} disabled={disabled} onChange={(v) => onChange({ nome: v })} />
-        <TextInput label="Telefono" value={value.telefono} disabled={disabled} onChange={(v) => onChange({ telefono: v })} />
-        <DateOfBirthInput value={value.data_nascita} disabled={disabled} onChange={(v) => onChange({ data_nascita: v })} />
-        <TextInput label="Luogo di nascita" value={value.luogo_nascita} disabled={disabled} onChange={(v) => onChange({ luogo_nascita: v })} />
-        <TextInput label="Stato" value={value.stato_nascita} disabled={disabled} onChange={(v) => onChange({ stato_nascita: v })} />
-        <TextInput label="Regione" value={value.regione_nascita} disabled={disabled} onChange={(v) => onChange({ regione_nascita: v })} />
-        <TextInput label="Provincia" value={value.provincia_nascita} disabled={disabled} onChange={(v) => onChange({ provincia_nascita: v })} />
-        <TextInput label="Residenza" value={value.residenza} disabled={disabled} onChange={(v) => onChange({ residenza: v })} />
-        <TextInput label="Lavori presso (indirizzo intervento)" value={value.lavori_presso} disabled={disabled} onChange={(v) => onChange({ lavori_presso: v })} />
       </Section>
 
       {!basicOnly && (
