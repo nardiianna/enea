@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
 import { FileManager } from '../../components/FileManager'
@@ -21,6 +21,7 @@ const CAMPI_MODIFICABILI = [
 
 export function PartnerPraticaDetail() {
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
   const [aziende, setAziende] = useState<AziendaPartner[]>([])
   const [value, setValue] = useState<PraticaFormValue | null>(null)
   const [saving, setSaving] = useState(false)
@@ -71,6 +72,17 @@ export function PartnerPraticaDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
+  async function handleElimina() {
+    if (!id) return
+    if (!window.confirm(`Eliminare ${nomeCliente} dai tuoi clienti? L'operazione non è reversibile.`)) return
+    const { error } = await supabase.from('pratiche').delete().eq('id', id)
+    if (error) {
+      setError(error.message)
+      return
+    }
+    navigate('/partner')
+  }
+
   if (!value) {
     return (
       <div>
@@ -86,8 +98,11 @@ export function PartnerPraticaDetail() {
     <div>
       <TopBar title={nomeCliente} />
       <div className="p-6 max-w-3xl mx-auto space-y-6">
-        <div className="flex justify-end text-xs text-gray-500 h-4">
-          {saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}
+        <div className="flex justify-between items-center text-xs">
+          <button onClick={handleElimina} className="text-red-600 hover:underline">
+            Elimina cliente
+          </button>
+          <span className="text-gray-500 h-4">{saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}</span>
         </div>
 
         {id && <FileManager praticaId={id} />}

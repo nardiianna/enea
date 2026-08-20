@@ -45,6 +45,16 @@ export function AdminAziendaDetail() {
     await supabase.from('pratiche').update({ [field]: checked }).eq('id', praticaId)
   }
 
+  async function handleElimina(praticaId: string, nomeCliente: string) {
+    if (!window.confirm(`Eliminare ${nomeCliente || 'questo cliente'}? L'operazione non è reversibile.`)) return
+    const { error } = await supabase.from('pratiche').delete().eq('id', praticaId)
+    if (error) {
+      setError(error.message)
+      return
+    }
+    setPratiche((rows) => rows.filter((r) => r.id !== praticaId))
+  }
+
   async function handleNuovoCliente() {
     if (!id) return
     setCreating(true)
@@ -95,6 +105,7 @@ export function AdminAziendaDetail() {
                 <th className="py-2 pr-4">Cliente</th>
                 <th className="py-2 pr-4">Stato</th>
                 <th className="py-2 pr-4">Creata il</th>
+                <th className="py-2 pr-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -112,6 +123,14 @@ export function AdminAziendaDetail() {
                     />
                   </td>
                   <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
+                  <td className="py-2 pr-4">
+                    <button
+                      onClick={() => handleElimina(p.id, `${p.cognome ?? ''} ${p.nome ?? ''}`.trim())}
+                      className="text-xs text-red-600 hover:underline"
+                    >
+                      Elimina
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
