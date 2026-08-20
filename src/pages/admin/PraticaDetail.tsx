@@ -31,6 +31,7 @@ export function PraticaDetail() {
   const [copied, setCopied] = useState(false)
   const [formOpen, setFormOpen] = useState(isNew)
   const skipNextAutosave = useRef(true)
+  const pendingAutosave = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     supabase
@@ -56,6 +57,23 @@ export function PraticaDetail() {
       })
   }, [id, isNew])
 
+  async function saveNow() {
+    if (isNew || !id) return
+    if (pendingAutosave.current) {
+      clearTimeout(pendingAutosave.current)
+      pendingAutosave.current = null
+    }
+    setSaving(true)
+    setSaved(false)
+    const { error } = await supabase.from('pratiche').update(value).eq('id', id)
+    setSaving(false)
+    if (error) setError(error.message)
+    else {
+      setError(null)
+      setSaved(true)
+    }
+  }
+
   useEffect(() => {
     if (isNew || !id || loading) return
     if (skipNextAutosave.current) {
@@ -64,16 +82,10 @@ export function PraticaDetail() {
     }
     setSaving(true)
     setSaved(false)
-    const timeout = setTimeout(async () => {
-      const { error } = await supabase.from('pratiche').update(value).eq('id', id)
-      setSaving(false)
-      if (error) setError(error.message)
-      else {
-        setError(null)
-        setSaved(true)
-      }
-    }, 800)
-    return () => clearTimeout(timeout)
+    pendingAutosave.current = setTimeout(saveNow, 800)
+    return () => {
+      if (pendingAutosave.current) clearTimeout(pendingAutosave.current)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
@@ -233,15 +245,13 @@ export function PraticaDetail() {
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 
-            {isNew && (
-              <button
-                onClick={handleCreaPratica}
-                disabled={saving}
-                className="rounded bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 text-sm font-medium disabled:opacity-50"
-              >
-                {saving ? 'Creazione...' : 'Crea pratica'}
-              </button>
-            )}
+            <button
+              onClick={isNew ? handleCreaPratica : saveNow}
+              disabled={saving}
+              className="rounded bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 text-sm font-medium disabled:opacity-50"
+            >
+              {isNew ? (saving ? 'Creazione...' : 'Crea pratica') : saving ? 'Salvataggio...' : 'Salva'}
+            </button>
           </>
         )}
       </div>

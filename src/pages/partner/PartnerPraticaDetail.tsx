@@ -28,6 +28,7 @@ export function PartnerPraticaDetail() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const skipNextAutosave = useRef(true)
+  const pendingAutosave = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     supabase
@@ -50,6 +51,24 @@ export function PartnerPraticaDetail() {
       })
   }, [id])
 
+  async function saveNow() {
+    if (!id || !value) return
+    if (pendingAutosave.current) {
+      clearTimeout(pendingAutosave.current)
+      pendingAutosave.current = null
+    }
+    setSaving(true)
+    setSaved(false)
+    const patch = Object.fromEntries(CAMPI_MODIFICABILI.map((campo) => [campo, value[campo] ?? null]))
+    const { error } = await supabase.from('pratiche').update(patch).eq('id', id)
+    setSaving(false)
+    if (error) setError(error.message)
+    else {
+      setError(null)
+      setSaved(true)
+    }
+  }
+
   useEffect(() => {
     if (!id || !value) return
     if (skipNextAutosave.current) {
@@ -58,17 +77,10 @@ export function PartnerPraticaDetail() {
     }
     setSaving(true)
     setSaved(false)
-    const timeout = setTimeout(async () => {
-      const patch = Object.fromEntries(CAMPI_MODIFICABILI.map((campo) => [campo, value[campo] ?? null]))
-      const { error } = await supabase.from('pratiche').update(patch).eq('id', id)
-      setSaving(false)
-      if (error) setError(error.message)
-      else {
-        setError(null)
-        setSaved(true)
-      }
-    }, 800)
-    return () => clearTimeout(timeout)
+    pendingAutosave.current = setTimeout(saveNow, 800)
+    return () => {
+      if (pendingAutosave.current) clearTimeout(pendingAutosave.current)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
@@ -116,6 +128,14 @@ export function PartnerPraticaDetail() {
         />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <button
+          onClick={saveNow}
+          disabled={saving}
+          className="rounded bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 text-sm font-medium disabled:opacity-50"
+        >
+          {saving ? 'Salvataggio...' : 'Salva'}
+        </button>
       </div>
     </div>
   )
