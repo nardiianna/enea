@@ -77,17 +77,6 @@ export function PraticaDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
-  async function handleElimina() {
-    if (!id) return
-    if (!window.confirm(`Eliminare ${nomeCliente || 'questo cliente'}? L'operazione non è reversibile.`)) return
-    const { error } = await supabase.from('pratiche').delete().eq('id', id)
-    if (error) {
-      setError(error.message)
-      return
-    }
-    navigate(value.azienda_partner_id ? `/admin/aziende/${value.azienda_partner_id}` : '/admin')
-  }
-
   async function handleCreaPratica() {
     setSaving(true)
     setError(null)
@@ -127,11 +116,8 @@ export function PraticaDetail() {
         )}
 
         {!isNew && (
-          <div className="flex justify-between items-center text-xs">
-            <button onClick={handleElimina} className="text-red-600 hover:underline">
-              Elimina cliente
-            </button>
-            <span className="text-gray-500 h-4">{saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}</span>
+          <div className="flex justify-end text-xs text-gray-500 h-4">
+            {saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}
           </div>
         )}
 
