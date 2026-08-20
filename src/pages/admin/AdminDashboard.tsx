@@ -15,7 +15,6 @@ type Row = Pick<
   | 'azienda_partner_id'
   | 'created_at'
   | 'inserita_enea'
-  | 'visibile_azienda'
   | 'problema'
   | 'pratica_finale_path'
 >
@@ -31,7 +30,7 @@ export function AdminDashboard() {
         supabase
           .from('pratiche')
           .select(
-            'id, cognome, nome, stato, azienda_partner_id, created_at, inserita_enea, visibile_azienda, problema, pratica_finale_path',
+            'id, cognome, nome, stato, azienda_partner_id, created_at, inserita_enea, problema, pratica_finale_path',
           )
           .order('created_at', { ascending: false }),
         supabase.from('aziende_partner').select('id, nome').order('nome'),
@@ -47,7 +46,7 @@ export function AdminDashboard() {
     return aziende.find((a) => a.id === id)?.nome ?? '—'
   }
 
-  async function handleFlagChange(praticaId: string, field: 'inserita_enea' | 'visibile_azienda', checked: boolean) {
+  async function handleFlagChange(praticaId: string, field: 'inserita_enea', checked: boolean) {
     setPratiche((rows) => rows.map((r) => (r.id === praticaId ? { ...r, [field]: checked } : r)))
     await supabase.from('pratiche').update({ [field]: checked }).eq('id', praticaId)
   }
@@ -77,7 +76,6 @@ export function AdminDashboard() {
                 <th className="py-2 pr-4">Cliente</th>
                 <th className="py-2 pr-4">Azienda</th>
                 <th className="py-2 pr-4">Stato</th>
-                <th className="py-2 pr-4">Visibile azienda</th>
                 <th className="py-2 pr-4">Creata il</th>
               </tr>
             </thead>
@@ -94,13 +92,6 @@ export function AdminDashboard() {
                     <Pallino
                       colore={getColorePallino(p)}
                       onClick={() => handleFlagChange(p.id, 'inserita_enea', !p.inserita_enea)}
-                    />
-                  </td>
-                  <td className="py-2 pr-4">
-                    <input
-                      type="checkbox"
-                      checked={p.visibile_azienda}
-                      onChange={(e) => handleFlagChange(p.id, 'visibile_azienda', e.target.checked)}
                     />
                   </td>
                   <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>

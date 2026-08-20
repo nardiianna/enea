@@ -202,14 +202,6 @@ export function PraticaDetail() {
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  checked={value.visibile_azienda ?? false}
-                  onChange={(e) => setValue((v) => ({ ...v, visibile_azienda: e.target.checked }))}
-                />
-                Pratica Enea compilata
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
                   checked={value.problema ?? false}
                   onChange={(e) => setValue((v) => ({ ...v, problema: e.target.checked }))}
                 />
