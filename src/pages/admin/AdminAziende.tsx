@@ -21,7 +21,7 @@ export function AdminAziende() {
 
   async function load() {
     const [aziendeRes, praticheRes] = await Promise.all([
-      supabase.from('aziende_partner').select('id, nome').order('nome'),
+      supabase.from('aziende_partner').select('id, nome').order('sort_order').order('nome'),
       supabase.from('pratiche').select('azienda_partner_id'),
     ])
     setAziende(aziendeRes.data ?? [])
@@ -67,7 +67,7 @@ export function AdminAziende() {
       setError(error.message)
       return
     }
-    if (data) setAziende((rows) => [...rows, data].sort((x, y) => x.nome.localeCompare(y.nome)))
+    if (data) setAziende((rows) => [...rows, data])
   }
 
   return (
