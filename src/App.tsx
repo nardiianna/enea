@@ -21,13 +21,13 @@ function Home() {
           to="/admin"
           className="w-full text-center rounded-lg border-2 border-brand-600 text-brand-700 dark:text-brand-400 dark:border-brand-500 py-3 text-sm font-semibold hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
         >
-          Area amministratori
+          Area Federico e Anna
         </Link>
         <Link
           to="/partner"
           className="w-full text-center rounded-lg border-2 border-brand-600 text-brand-700 dark:text-brand-400 dark:border-brand-500 py-3 text-sm font-semibold hover:bg-brand-50 dark:hover:bg-brand-900/30 transition-colors"
         >
-          Area aziende partner
+          Area Clienti
         </Link>
       </div>
     </div>

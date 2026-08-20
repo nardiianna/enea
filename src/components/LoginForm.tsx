@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import logo from '../assets/logo-full.png'
 
@@ -26,6 +26,9 @@ export function LoginForm({ title, redirectTo }: { title: string; redirectTo: st
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 rounded border border-gray-200 dark:border-gray-700 p-6">
+        <Link to="/" className="inline-block text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+          ← Indietro
+        </Link>
         <img src={logo} alt="Pratiche ENEA — Nardi" className="mx-auto w-48" />
         <h1 className="text-lg font-semibold text-center">{title}</h1>
         <input
