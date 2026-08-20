@@ -7,7 +7,18 @@ import { useAuth } from '../../hooks/useAuth'
 import type { Pratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
 
-type Row = Pick<Pratica, 'id' | 'cognome' | 'nome' | 'stato' | 'created_at' | 'problema' | 'pratica_finale_path'>
+type Row = Pick<
+  Pratica,
+  | 'id'
+  | 'cognome'
+  | 'nome'
+  | 'stato'
+  | 'created_at'
+  | 'problema'
+  | 'pratica_finale_enea_path'
+  | 'pratica_finale_ricevuta_path'
+  | 'pratica_finale_dichiarazione_path'
+>
 
 export function PartnerDashboard() {
   const navigate = useNavigate()
@@ -20,7 +31,9 @@ export function PartnerDashboard() {
   useEffect(() => {
     supabase
       .from('pratiche')
-      .select('id, cognome, nome, stato, created_at, problema, pratica_finale_path')
+      .select(
+        'id, cognome, nome, stato, created_at, problema, pratica_finale_enea_path, pratica_finale_ricevuta_path, pratica_finale_dichiarazione_path',
+      )
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         setPratiche(data ?? [])
@@ -95,7 +108,9 @@ export function PartnerDashboard() {
             </thead>
             <tbody>
               {pratiche.map((p) => {
-                const colore = p.pratica_finale_path ? 'verde' : p.problema ? 'rosso' : 'bianco'
+                const praticaFinaleCompleta =
+                  p.pratica_finale_enea_path && p.pratica_finale_ricevuta_path && p.pratica_finale_dichiarazione_path
+                const colore = praticaFinaleCompleta ? 'verde' : p.problema ? 'rosso' : 'bianco'
                 return (
                   <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
                     <td className="py-2 pr-4">
@@ -109,9 +124,9 @@ export function PartnerDashboard() {
                     <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
                     <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
                     <td className="py-2 pr-4">
-                      {p.pratica_finale_path && (
+                      {p.pratica_finale_enea_path && (
                         <button
-                          onClick={() => handleScaricaPraticaFinale(p.pratica_finale_path!)}
+                          onClick={() => handleScaricaPraticaFinale(p.pratica_finale_enea_path!)}
                           className="text-brand-700 hover:underline"
                         >
                           Scarica Pratica Enea

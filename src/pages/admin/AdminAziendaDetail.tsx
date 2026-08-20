@@ -9,7 +9,16 @@ import { useAuth } from '../../hooks/useAuth'
 
 type Row = Pick<
   Pratica,
-  'id' | 'cognome' | 'nome' | 'stato' | 'created_at' | 'inserita_enea' | 'problema' | 'pratica_finale_path'
+  | 'id'
+  | 'cognome'
+  | 'nome'
+  | 'stato'
+  | 'created_at'
+  | 'inserita_enea'
+  | 'problema'
+  | 'pratica_finale_enea_path'
+  | 'pratica_finale_ricevuta_path'
+  | 'pratica_finale_dichiarazione_path'
 >
 
 export function AdminAziendaDetail() {
@@ -29,7 +38,9 @@ export function AdminAziendaDetail() {
         supabase.from('aziende_partner').select('id, nome').eq('id', id).single(),
         supabase
           .from('pratiche')
-          .select('id, cognome, nome, stato, created_at, inserita_enea, problema, pratica_finale_path')
+          .select(
+            'id, cognome, nome, stato, created_at, inserita_enea, problema, pratica_finale_enea_path, pratica_finale_ricevuta_path, pratica_finale_dichiarazione_path',
+          )
           .eq('azienda_partner_id', id)
           .order('created_at', { ascending: false }),
       ])

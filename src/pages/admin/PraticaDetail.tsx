@@ -3,13 +3,19 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
 import { FileManager } from '../../components/FileManager'
-import { PraticaFinaleUpload } from '../../components/PraticaFinaleUpload'
+import { PraticaFinaleUpload, type PraticaFinaleSlotKey } from '../../components/PraticaFinaleUpload'
 import { PraticaForm, type PraticaFormValue } from '../../components/form/PraticaForm'
 import type { AziendaPartner, Pratica, StatoPratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
 import { useAuth } from '../../hooks/useAuth'
 
 const STATI: StatoPratica[] = ['in_attesa_cliente', 'compilata_da_cliente', 'in_revisione', 'completata']
+
+const FIELD_BY_SLOT: Record<PraticaFinaleSlotKey, keyof PraticaFormValue> = {
+  enea: 'pratica_finale_enea_path',
+  ricevuta: 'pratica_finale_ricevuta_path',
+  dichiarazione: 'pratica_finale_dichiarazione_path',
+}
 
 export function PraticaDetail() {
   const { id } = useParams<{ id: string }>()
@@ -163,8 +169,12 @@ export function PraticaDetail() {
         {!isNew && id && (
           <PraticaFinaleUpload
             praticaId={id}
-            path={value.pratica_finale_path ?? null}
-            onChange={(path) => setValue((v) => ({ ...v, pratica_finale_path: path }))}
+            paths={{
+              enea: value.pratica_finale_enea_path,
+              ricevuta: value.pratica_finale_ricevuta_path,
+              dichiarazione: value.pratica_finale_dichiarazione_path,
+            }}
+            onChange={(key, path) => setValue((v) => ({ ...v, [FIELD_BY_SLOT[key]]: path }))}
           />
         )}
 

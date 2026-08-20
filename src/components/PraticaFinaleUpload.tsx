@@ -1,29 +1,58 @@
 import { useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
+export type PraticaFinaleSlotKey = 'enea' | 'ricevuta' | 'dichiarazione'
+
+const SLOT_LABELS: Record<PraticaFinaleSlotKey, string> = {
+  enea: 'Pratica ENEA',
+  ricevuta: 'Ricevuta',
+  dichiarazione: 'Dichiarazione del fornitore',
+}
+
+const SLOT_ORDER: PraticaFinaleSlotKey[] = ['enea', 'ricevuta', 'dichiarazione']
+
 interface Props {
   praticaId: string
+  paths: Partial<Record<PraticaFinaleSlotKey, string | null>>
+  onChange: (key: PraticaFinaleSlotKey, path: string | null) => void
+}
+
+export function PraticaFinaleUpload({ praticaId, paths, onChange }: Props) {
+  return (
+    <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+      <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Pratica finale</h3>
+      {SLOT_ORDER.map((key) => (
+        <FinalDocSlot
+          key={key}
+          praticaId={praticaId}
+          slotKey={key}
+          path={paths[key] ?? null}
+          onChange={(path) => onChange(key, path)}
+        />
+      ))}
+    </div>
+  )
+}
+
+interface SlotProps {
+  praticaId: string
+  slotKey: PraticaFinaleSlotKey
   path: string | null
   onChange: (path: string | null) => void
 }
 
-export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
+function FinalDocSlot({ praticaId, slotKey, path, onChange }: SlotProps) {
   const [uploading, setUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  async function persist(newPath: string | null) {
-    await supabase.from('pratiche').update({ pratica_finale_path: newPath }).eq('id', praticaId)
-    onChange(newPath)
-  }
 
   async function handleUpload(fileList: FileList | null) {
     const file = fileList?.[0]
     if (!file) return
     setUploading(true)
     setError(null)
-    const newPath = `${praticaId}/pratica-finale/${Date.now()}-${file.name}`
+    const newPath = `${praticaId}/pratica-finale/${slotKey}/${Date.now()}-${file.name}`
     const { error: uploadError } = await supabase.storage.from('fatture').upload(newPath, file)
     if (uploadError) {
       setError(uploadError.message)
@@ -31,7 +60,7 @@ export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
       return
     }
     if (path) await supabase.storage.from('fatture').remove([path])
-    await persist(newPath)
+    onChange(newPath)
     setUploading(false)
     if (inputRef.current) inputRef.current.value = ''
   }
@@ -39,7 +68,7 @@ export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
   async function handleRemove() {
     if (!path) return
     await supabase.storage.from('fatture').remove([path])
-    await persist(null)
+    onChange(null)
   }
 
   async function handleDownload() {
@@ -62,17 +91,17 @@ export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
         setDragActive(false)
         handleUpload(e.dataTransfer.files)
       }}
-      className={`rounded border p-4 space-y-3 transition-colors ${
+      className={`rounded border p-3 space-y-2 transition-colors ${
         dragActive
           ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20'
           : 'border-gray-200 dark:border-gray-700'
       }`}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Pratica finale</h3>
+        <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300">{SLOT_LABELS[slotKey]}</h4>
         {!path && (
           <label className="rounded bg-brand-600 hover:bg-brand-700 text-white px-3 py-1.5 text-xs font-medium cursor-pointer">
-            {uploading ? 'Caricamento...' : '+ Carica pratica finale'}
+            {uploading ? 'Caricamento...' : '+ Carica file'}
             <input
               ref={inputRef}
               type="file"
@@ -96,7 +125,7 @@ export function PraticaFinaleUpload({ praticaId, path, onChange }: Props) {
           </button>
         </div>
       ) : (
-        <p className="text-sm text-gray-500">Nessuna pratica finale allegata ancora. Trascina qui il file o usa il bottone.</p>
+        <p className="text-xs text-gray-500">Nessun file caricato ancora. Trascina qui il file o usa il bottone.</p>
       )}
     </div>
   )
