@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
+import { Pallino } from '../../components/Pallino'
 import { useAuth } from '../../hooks/useAuth'
 import type { Pratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
 
-type Row = Pick<Pratica, 'id' | 'cognome' | 'nome' | 'stato' | 'created_at'>
+type Row = Pick<Pratica, 'id' | 'cognome' | 'nome' | 'stato' | 'created_at' | 'problema' | 'pratica_finale_path'>
 
 export function PartnerDashboard() {
   const navigate = useNavigate()
@@ -19,13 +20,18 @@ export function PartnerDashboard() {
   useEffect(() => {
     supabase
       .from('pratiche')
-      .select('id, cognome, nome, stato, created_at')
+      .select('id, cognome, nome, stato, created_at, problema, pratica_finale_path')
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         setPratiche(data ?? [])
         setLoading(false)
       })
   }, [])
+
+  async function handleScaricaPraticaFinale(path: string) {
+    const { data, error } = await supabase.storage.from('fatture').createSignedUrl(path, 60)
+    if (!error && data) window.open(data.signedUrl, '_blank')
+  }
 
   async function handleNuovoCliente() {
     if (!profile?.azienda_partner_id) return
@@ -69,23 +75,41 @@ export function PartnerDashboard() {
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="text-left border-b border-gray-200 dark:border-gray-700">
+                <th className="py-2 pr-4"></th>
                 <th className="py-2 pr-4">Cliente</th>
                 <th className="py-2 pr-4">Stato</th>
                 <th className="py-2 pr-4">Creata il</th>
+                <th className="py-2 pr-4"></th>
               </tr>
             </thead>
             <tbody>
-              {pratiche.map((p) => (
-                <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
-                  <td className="py-2 pr-4">
-                    <Link to={`/partner/pratiche/${p.id}`} className="text-brand-700 hover:underline">
-                      {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
-                    </Link>
-                  </td>
-                  <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
-                  <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
-                </tr>
-              ))}
+              {pratiche.map((p) => {
+                const colore = p.pratica_finale_path ? 'verde' : p.problema ? 'rosso' : 'bianco'
+                return (
+                  <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
+                    <td className="py-2 pr-4">
+                      <Pallino colore={colore} />
+                    </td>
+                    <td className="py-2 pr-4">
+                      <Link to={`/partner/pratiche/${p.id}`} className="text-brand-700 hover:underline">
+                        {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
+                      </Link>
+                    </td>
+                    <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
+                    <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
+                    <td className="py-2 pr-4">
+                      {p.pratica_finale_path && (
+                        <button
+                          onClick={() => handleScaricaPraticaFinale(p.pratica_finale_path!)}
+                          className="text-brand-700 hover:underline"
+                        >
+                          Scarica Pratica Enea
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}
