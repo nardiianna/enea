@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
@@ -26,9 +26,11 @@ export function PraticaDetail() {
   })
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [formOpen, setFormOpen] = useState(isNew)
+  const skipNextAutosave = useRef(true)
 
   useEffect(() => {
     supabase
@@ -47,44 +49,48 @@ export function PraticaDetail() {
       .single()
       .then(({ data }) => {
         const pratica = (data as Pratica) ?? {}
+        skipNextAutosave.current = true
         setValue(pratica)
         setFormOpen(Boolean(pratica.cognome || pratica.nome || pratica.tipo_lavoro?.length))
         setLoading(false)
       })
   }, [id, isNew])
 
-  async function handleSave() {
-    setSaving(true)
-    setError(null)
-
-    if (isNew) {
-      const { data, error } = await supabase
-        .from('pratiche')
-        .insert({ ...value, created_by: session?.user.id })
-        .select('id')
-        .single()
-      setSaving(false)
-      if (error) {
-        setError(error.message)
-        return
-      }
-      navigate(`/admin/pratiche/${data.id}`)
+  useEffect(() => {
+    if (isNew || !id || loading) return
+    if (skipNextAutosave.current) {
+      skipNextAutosave.current = false
       return
     }
+    setSaving(true)
+    setSaved(false)
+    const timeout = setTimeout(async () => {
+      const { error } = await supabase.from('pratiche').update(value).eq('id', id)
+      setSaving(false)
+      if (error) setError(error.message)
+      else {
+        setError(null)
+        setSaved(true)
+      }
+    }, 800)
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
 
-    const { error } = await supabase.from('pratiche').update(value).eq('id', id)
+  async function handleCreaPratica() {
+    setSaving(true)
+    setError(null)
+    const { data, error } = await supabase
+      .from('pratiche')
+      .insert({ ...value, created_by: session?.user.id })
+      .select('id')
+      .single()
     setSaving(false)
-    if (error) setError(error.message)
-  }
-
-  async function handleStatoChange(stato: StatoPratica) {
-    setValue((v) => ({ ...v, stato }))
-    if (!isNew && id) await supabase.from('pratiche').update({ stato }).eq('id', id)
-  }
-
-  async function handleFlagChange(field: 'inserita_enea' | 'visibile_azienda' | 'problema', checked: boolean) {
-    setValue((v) => ({ ...v, [field]: checked }))
-    if (!isNew && id) await supabase.from('pratiche').update({ [field]: checked }).eq('id', id)
+    if (error) {
+      setError(error.message)
+      return
+    }
+    navigate(`/admin/pratiche/${data.id}`)
   }
 
   if (loading) {
@@ -110,6 +116,12 @@ export function PraticaDetail() {
         )}
 
         {!isNew && (
+          <div className="flex justify-end text-xs text-gray-500 h-4">
+            {saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}
+          </div>
+        )}
+
+        {!isNew && (
           <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
             <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Cliente</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -131,13 +143,6 @@ export function PraticaDetail() {
               </label>
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="rounded bg-brand-600 hover:bg-brand-700 text-white px-4 py-1.5 text-sm font-medium disabled:opacity-50"
-            >
-              {saving ? 'Salvataggio...' : 'Salva'}
-            </button>
           </div>
         )}
 
@@ -159,7 +164,7 @@ export function PraticaDetail() {
                 <select
                   className="ml-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm"
                   value={value.stato}
-                  onChange={(e) => handleStatoChange(e.target.value as StatoPratica)}
+                  onChange={(e) => setValue((v) => ({ ...v, stato: e.target.value as StatoPratica }))}
                 >
                   {STATI.map((s) => (
                     <option key={s} value={s}>
@@ -190,7 +195,7 @@ export function PraticaDetail() {
                 <input
                   type="checkbox"
                   checked={value.inserita_enea ?? false}
-                  onChange={(e) => handleFlagChange('inserita_enea', e.target.checked)}
+                  onChange={(e) => setValue((v) => ({ ...v, inserita_enea: e.target.checked }))}
                 />
                 Cliente contattato
               </label>
@@ -198,7 +203,7 @@ export function PraticaDetail() {
                 <input
                   type="checkbox"
                   checked={value.visibile_azienda ?? false}
-                  onChange={(e) => handleFlagChange('visibile_azienda', e.target.checked)}
+                  onChange={(e) => setValue((v) => ({ ...v, visibile_azienda: e.target.checked }))}
                 />
                 Pratica Enea compilata
               </label>
@@ -206,7 +211,7 @@ export function PraticaDetail() {
                 <input
                   type="checkbox"
                   checked={value.problema ?? false}
-                  onChange={(e) => handleFlagChange('problema', e.target.checked)}
+                  onChange={(e) => setValue((v) => ({ ...v, problema: e.target.checked }))}
                 />
                 C'è un problema
               </label>
@@ -236,13 +241,15 @@ export function PraticaDetail() {
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="rounded bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 text-sm font-medium disabled:opacity-50"
-            >
-              {saving ? 'Salvataggio...' : isNew ? 'Crea pratica' : 'Salva modifiche'}
-            </button>
+            {isNew && (
+              <button
+                onClick={handleCreaPratica}
+                disabled={saving}
+                className="rounded bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 text-sm font-medium disabled:opacity-50"
+              >
+                {saving ? 'Creazione...' : 'Crea pratica'}
+              </button>
+            )}
           </>
         )}
       </div>

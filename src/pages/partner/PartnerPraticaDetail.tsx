@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
@@ -26,6 +26,7 @@ export function PartnerPraticaDetail() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const skipNextAutosave = useRef(true)
 
   useEffect(() => {
     supabase
@@ -42,24 +43,33 @@ export function PartnerPraticaDetail() {
       .select('*')
       .eq('id', id)
       .single()
-      .then(({ data }) => setValue(data ?? {}))
+      .then(({ data }) => {
+        skipNextAutosave.current = true
+        setValue(data ?? {})
+      })
   }, [id])
 
-  async function handleSave() {
+  useEffect(() => {
     if (!id || !value) return
-    setSaving(true)
-    setError(null)
-    setSaved(false)
-    const patch = Object.fromEntries(CAMPI_MODIFICABILI.map((campo) => [campo, value[campo] ?? null]))
-    const { error } = await supabase.from('pratiche').update(patch).eq('id', id)
-    setSaving(false)
-    if (error) {
-      setError(error.message)
+    if (skipNextAutosave.current) {
+      skipNextAutosave.current = false
       return
     }
-    setSaved(true)
-    setTimeout(() => setSaved(false), 1500)
-  }
+    setSaving(true)
+    setSaved(false)
+    const timeout = setTimeout(async () => {
+      const patch = Object.fromEntries(CAMPI_MODIFICABILI.map((campo) => [campo, value[campo] ?? null]))
+      const { error } = await supabase.from('pratiche').update(patch).eq('id', id)
+      setSaving(false)
+      if (error) setError(error.message)
+      else {
+        setError(null)
+        setSaved(true)
+      }
+    }, 800)
+    return () => clearTimeout(timeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
 
   if (!value) {
     return (
@@ -76,6 +86,10 @@ export function PartnerPraticaDetail() {
     <div>
       <TopBar title={nomeCliente} />
       <div className="p-6 max-w-3xl mx-auto space-y-6">
+        <div className="flex justify-end text-xs text-gray-500 h-4">
+          {saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}
+        </div>
+
         {id && <FileManager praticaId={id} />}
 
         <PraticaForm
@@ -87,14 +101,6 @@ export function PartnerPraticaDetail() {
         />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="rounded bg-brand-600 hover:bg-brand-700 text-white px-6 py-2 text-sm font-medium disabled:opacity-50"
-        >
-          {saving ? 'Salvataggio...' : saved ? 'Salvato!' : 'Salva'}
-        </button>
       </div>
     </div>
   )
