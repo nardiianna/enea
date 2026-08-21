@@ -34,7 +34,8 @@ export function PartnerDashboard() {
       .select(
         'id, cognome, nome, stato, created_at, problema, pratica_finale_enea_path, pratica_finale_ricevuta_path, pratica_finale_dichiarazione_path',
       )
-      .order('created_at', { ascending: false })
+      .order('cognome', { ascending: true })
+      .order('nome', { ascending: true })
       .then(({ data }) => {
         setPratiche(data ?? [])
         setLoading(false)
