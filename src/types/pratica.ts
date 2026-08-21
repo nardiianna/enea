@@ -94,6 +94,7 @@ export interface Pratica {
 
   cognome: string | null
   nome: string | null
+  azienda: string | null
   telefono: string | null
   data_nascita: string | null
   luogo_nascita: string | null

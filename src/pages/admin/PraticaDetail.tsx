@@ -142,7 +142,7 @@ export function PraticaDetail() {
         {!isNew && (
           <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
             <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Cliente</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Cognome
                 <input
@@ -157,6 +157,14 @@ export function PraticaDetail() {
                   className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
                   value={value.nome ?? ''}
                   onChange={(e) => setValue((v) => ({ ...v, nome: e.target.value }))}
+                />
+              </label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Azienda
+                <input
+                  className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm"
+                  value={value.azienda ?? ''}
+                  onChange={(e) => setValue((v) => ({ ...v, azienda: e.target.value }))}
                 />
               </label>
             </div>
