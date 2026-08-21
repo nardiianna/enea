@@ -34,7 +34,8 @@ export function AdminDashboard() {
           .select(
             'id, cognome, nome, stato, azienda_partner_id, created_at, inserita_enea, problema, pratica_finale_enea_path, pratica_finale_ricevuta_path, pratica_finale_dichiarazione_path',
           )
-          .order('created_at', { ascending: false }),
+          .order('cognome', { ascending: true })
+          .order('nome', { ascending: true }),
         supabase.from('aziende_partner').select('id, nome').order('nome'),
       ])
       setPratiche(praticheRes.data ?? [])
