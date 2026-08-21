@@ -23,7 +23,7 @@ export function ClientForm() {
           return
         }
         setValue(data as PraticaFormValue)
-        if ((data as PraticaFormValue).stato !== 'in_attesa_cliente') setSubmitted(true)
+        if ((data as PraticaFormValue).stato !== 'da_contattare') setSubmitted(true)
       })
   }, [token])
 

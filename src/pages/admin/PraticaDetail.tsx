@@ -9,7 +9,7 @@ import type { AziendaPartner, Pratica, StatoPratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
 import { useAuth } from '../../hooks/useAuth'
 
-const STATI: StatoPratica[] = ['in_attesa_cliente', 'compilata_da_cliente', 'in_revisione', 'completata']
+const STATI: StatoPratica[] = ['da_contattare', 'contattato']
 
 const FIELD_BY_SLOT: Record<PraticaFinaleSlotKey, keyof PraticaFormValue> = {
   enea: 'pratica_finale_enea_path',

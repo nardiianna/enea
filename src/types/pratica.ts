@@ -15,17 +15,11 @@ export const TIPO_LAVORO_LABELS: Record<TipoLavoro, string> = {
   condizionatore: 'Condizionatore',
 }
 
-export type StatoPratica =
-  | 'in_attesa_cliente'
-  | 'compilata_da_cliente'
-  | 'in_revisione'
-  | 'completata'
+export type StatoPratica = 'da_contattare' | 'contattato'
 
 export const STATO_LABELS: Record<StatoPratica, string> = {
-  in_attesa_cliente: 'In attesa del cliente',
-  compilata_da_cliente: 'Compilata dal cliente',
-  in_revisione: 'In revisione',
-  completata: 'Completata',
+  da_contattare: 'Da contattare',
+  contattato: 'Contattato',
 }
 
 export interface AziendaPartner {
