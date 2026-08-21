@@ -115,7 +115,7 @@ export function AdminAziendaDetail() {
             <thead>
               <tr className="text-left border-b border-gray-200 dark:border-gray-700">
                 <th className="py-2 pr-4">Cliente</th>
-                <th className="py-2 pr-4">Stato</th>
+                <th className="py-2 pr-4 text-center">Stato</th>
                 <th className="py-2 pr-4">Creata il</th>
                 <th className="py-2 pr-4"></th>
               </tr>
@@ -128,7 +128,7 @@ export function AdminAziendaDetail() {
                       {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
                     </Link>
                   </td>
-                  <td className="py-2 pr-4">
+                  <td className="py-2 pr-4 text-center">
                     <Pallino
                       colore={getColorePallino(p)}
                       onClick={() => handleFlagChange(p.id, 'inserita_enea', !p.inserita_enea)}
