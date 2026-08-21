@@ -12,6 +12,7 @@ type Row = Pick<
   | 'id'
   | 'cognome'
   | 'nome'
+  | 'azienda'
   | 'stato'
   | 'created_at'
   | 'inserita_enea'
@@ -39,7 +40,7 @@ export function AdminAziendaDetail() {
         supabase
           .from('pratiche')
           .select(
-            'id, cognome, nome, stato, created_at, inserita_enea, problema, pratica_finale_enea_path, pratica_finale_ricevuta_path, pratica_finale_dichiarazione_path',
+            'id, cognome, nome, azienda, stato, created_at, inserita_enea, problema, pratica_finale_enea_path, pratica_finale_ricevuta_path, pratica_finale_dichiarazione_path',
           )
           .eq('azienda_partner_id', id)
           .order('cognome', { ascending: true })
@@ -125,7 +126,7 @@ export function AdminAziendaDetail() {
                 <tr key={p.id} className="border-b border-gray-100 dark:border-gray-800">
                   <td className="py-2 pr-4">
                     <Link to={`/admin/pratiche/${p.id}`} className="text-brand-700 hover:underline">
-                      {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : '(senza nome)'}
+                      {p.cognome || p.nome ? `${p.cognome ?? ''} ${p.nome ?? ''}`.trim() : p.azienda || '(senza nome)'}
                     </Link>
                   </td>
                   <td className="py-2 pr-4 text-center">
