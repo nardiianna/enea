@@ -43,13 +43,6 @@ export function PartnerDashboard() {
       })
   }, [])
 
-  async function handleScaricaPraticaFinale(path: string) {
-    const preview = window.open('', '_blank')
-    const { data, error } = await supabase.storage.from('fatture').createSignedUrl(path, 60)
-    if (!error && data && preview) preview.location.href = data.signedUrl
-    else preview?.close()
-  }
-
   async function handleElimina(praticaId: string, nomeCliente: string) {
     if (!window.confirm(`Eliminare ${nomeCliente || 'questo cliente'}? L'operazione non è reversibile.`)) return
     const { error } = await supabase.from('pratiche').delete().eq('id', praticaId)
@@ -107,7 +100,6 @@ export function PartnerDashboard() {
                 <th className="py-2 pr-4">Stato</th>
                 <th className="py-2 pr-4">Creata il</th>
                 <th className="py-2 pr-4"></th>
-                <th className="py-2 pr-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -127,16 +119,6 @@ export function PartnerDashboard() {
                     </td>
                     <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
                     <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
-                    <td className="py-2 pr-4">
-                      {p.pratica_finale_enea_path && (
-                        <button
-                          onClick={() => handleScaricaPraticaFinale(p.pratica_finale_enea_path!)}
-                          className="text-brand-700 hover:underline"
-                        >
-                          Scarica Pratica Enea
-                        </button>
-                      )}
-                    </td>
                     <td className="py-2 pr-4">
                       <button
                         onClick={() => handleElimina(p.id, `${p.cognome ?? ''} ${p.nome ?? ''}`.trim())}

@@ -107,6 +107,27 @@ export function PartnerPraticaDetail() {
 
   const nomeCliente = value.cognome || value.nome ? `${value.cognome ?? ''} ${value.nome ?? ''}`.trim() : 'Nuovo cliente'
 
+  const praticaFinaleCompleta = Boolean(
+    value.pratica_finale_enea_path && value.pratica_finale_ricevuta_path && value.pratica_finale_dichiarazione_path,
+  )
+
+  if (praticaFinaleCompleta) {
+    return (
+      <div>
+        <TopBar title={nomeCliente} />
+        <div className="p-6 max-w-3xl mx-auto space-y-6">
+          <PraticaFinaleDownload
+            paths={{
+              enea: value.pratica_finale_enea_path!,
+              ricevuta: value.pratica_finale_ricevuta_path!,
+              dichiarazione: value.pratica_finale_dichiarazione_path!,
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <TopBar title={nomeCliente} />
@@ -117,16 +138,6 @@ export function PartnerPraticaDetail() {
           </button>
           <span className="text-gray-500 h-4">{saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}</span>
         </div>
-
-        {value.pratica_finale_enea_path && value.pratica_finale_ricevuta_path && value.pratica_finale_dichiarazione_path && (
-          <PraticaFinaleDownload
-            paths={{
-              enea: value.pratica_finale_enea_path,
-              ricevuta: value.pratica_finale_ricevuta_path,
-              dichiarazione: value.pratica_finale_dichiarazione_path,
-            }}
-          />
-        )}
 
         {id && <FileManager praticaId={id} />}
 
