@@ -44,8 +44,10 @@ export function PartnerDashboard() {
   }, [])
 
   async function handleScaricaPraticaFinale(path: string) {
+    const preview = window.open('', '_blank', 'noopener,noreferrer')
     const { data, error } = await supabase.storage.from('fatture').createSignedUrl(path, 60)
-    if (!error && data) window.open(data.signedUrl, '_blank')
+    if (!error && data && preview) preview.location.href = data.signedUrl
+    else preview?.close()
   }
 
   async function handleElimina(praticaId: string, nomeCliente: string) {

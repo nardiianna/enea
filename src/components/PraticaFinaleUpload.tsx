@@ -73,8 +73,10 @@ function FinalDocSlot({ praticaId, slotKey, path, onChange }: SlotProps) {
 
   async function handleDownload() {
     if (!path) return
+    const preview = window.open('', '_blank', 'noopener,noreferrer')
     const { data, error } = await supabase.storage.from('fatture').createSignedUrl(path, 60)
-    if (!error && data) window.open(data.signedUrl, '_blank')
+    if (!error && data && preview) preview.location.href = data.signedUrl
+    else preview?.close()
   }
 
   const filename = path?.split('/').pop()?.replace(/^\d+-/, '')
