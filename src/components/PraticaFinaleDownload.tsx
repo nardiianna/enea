@@ -22,24 +22,30 @@ export function PraticaFinaleDownload({ paths }: Props) {
     else preview?.close()
   }
 
+  const hasFiles = SLOTS.some(({ key }) => paths[key])
+
   return (
     <div className="rounded border border-gray-200 dark:border-gray-700 p-4 space-y-3">
       <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200">Pratica finale</h3>
-      <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-        {SLOTS.map(({ key, label }) => {
-          const path = paths[key]
-          if (!path) return null
-          const filename = path.split('/').pop()?.replace(/^\d+-/, '')
-          return (
-            <li key={key} className="flex items-center justify-between py-2 text-sm">
-              <span className="text-gray-500 dark:text-gray-400">{label}</span>
-              <button onClick={() => handleDownload(path)} className="text-brand-700 hover:underline text-left truncate max-w-xs">
-                {filename}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
+      {hasFiles ? (
+        <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+          {SLOTS.map(({ key, label }) => {
+            const path = paths[key]
+            if (!path) return null
+            const filename = path.split('/').pop()?.replace(/^\d+-/, '')
+            return (
+              <li key={key} className="flex items-center justify-between py-2 text-sm">
+                <span className="text-gray-500 dark:text-gray-400">{label}</span>
+                <button onClick={() => handleDownload(path)} className="text-brand-700 hover:underline text-left truncate max-w-xs">
+                  {filename}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">Non ci sono file allegati.</p>
+      )}
     </div>
   )
 }

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
 import { Pallino } from '../../components/Pallino'
-import { useAuth } from '../../hooks/useAuth'
 import type { Pratica } from '../../types/pratica'
 import { STATO_LABELS } from '../../types/pratica'
 
@@ -22,11 +21,8 @@ type Row = Pick<
 >
 
 export function PartnerDashboard() {
-  const navigate = useNavigate()
-  const { session, profile } = useAuth()
   const [pratiche, setPratiche] = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -53,37 +49,11 @@ export function PartnerDashboard() {
     setPratiche((rows) => rows.filter((r) => r.id !== praticaId))
   }
 
-  async function handleNuovoCliente() {
-    if (!profile?.azienda_partner_id) return
-    setCreating(true)
-    setError(null)
-    const { data, error } = await supabase
-      .from('pratiche')
-      .insert({ azienda_partner_id: profile.azienda_partner_id, tipo_lavoro: [], created_by: session?.user.id })
-      .select('id')
-      .single()
-    setCreating(false)
-    if (error) {
-      setError(error.message)
-      return
-    }
-    if (data) navigate(`/partner/pratiche/${data.id}`)
-  }
-
   return (
     <div>
       <TopBar title="Pratiche ENEA — Area partner" />
       <div className="p-6 space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Le tue pratiche</h2>
-          <button
-            onClick={handleNuovoCliente}
-            disabled={creating}
-            className="rounded bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-sm font-medium disabled:opacity-50"
-          >
-            {creating ? 'Creazione...' : '+ Nuovo cliente'}
-          </button>
-        </div>
+        <h2 className="text-lg font-semibold">Le tue pratiche</h2>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 

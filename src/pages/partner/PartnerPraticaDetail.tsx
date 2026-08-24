@@ -139,6 +139,14 @@ export function PartnerPraticaDetail() {
           <span className="text-gray-500 h-4">{saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}</span>
         </div>
 
+        <PraticaFinaleDownload
+          paths={{
+            enea: value.pratica_finale_enea_path ?? null,
+            ricevuta: value.pratica_finale_ricevuta_path ?? null,
+            dichiarazione: value.pratica_finale_dichiarazione_path ?? null,
+          }}
+        />
+
         {id && <FileManager praticaId={id} />}
 
         <PraticaForm
