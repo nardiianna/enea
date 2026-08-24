@@ -73,16 +73,17 @@ export function PraticaForm({
             </div>
           </div>
         )}
-        <SelectInput
-          label="Aliquota"
-          value={value.aliquota}
-          disabled={!editableMeta}
-          options={[
-            { value: '50', label: '50%' },
-            { value: '36', label: '36%' },
-          ]}
-          onChange={(v) => onChange({ aliquota: v })}
-        />
+        {editableMeta && (
+          <SelectInput
+            label="Aliquota"
+            value={value.aliquota}
+            options={[
+              { value: '50', label: '50%' },
+              { value: '36', label: '36%' },
+            ]}
+            onChange={(v) => onChange({ aliquota: v })}
+          />
+        )}
         <div className="sm:col-span-2">
           <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Tipo di lavoro
