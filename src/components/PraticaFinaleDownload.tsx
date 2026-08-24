@@ -16,7 +16,7 @@ interface Props {
 
 export function PraticaFinaleDownload({ paths }: Props) {
   async function handleDownload(path: string) {
-    const preview = window.open('', '_blank', 'noopener,noreferrer')
+    const preview = window.open('', '_blank')
     const { data, error } = await supabase.storage.from('fatture').createSignedUrl(path, 60)
     if (!error && data && preview) preview.location.href = data.signedUrl
     else preview?.close()

@@ -73,7 +73,7 @@ function FinalDocSlot({ praticaId, slotKey, path, onChange }: SlotProps) {
 
   async function handleDownload() {
     if (!path) return
-    const preview = window.open('', '_blank', 'noopener,noreferrer')
+    const preview = window.open('', '_blank')
     const { data, error } = await supabase.storage.from('fatture').createSignedUrl(path, 60)
     if (!error && data && preview) preview.location.href = data.signedUrl
     else preview?.close()
