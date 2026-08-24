@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { TopBar } from '../../components/TopBar'
 import { FileManager } from '../../components/FileManager'
+import { PraticaFinaleDownload } from '../../components/PraticaFinaleDownload'
 import { PraticaForm, type PraticaFormValue } from '../../components/form/PraticaForm'
 import type { AziendaPartner } from '../../types/pratica'
 
@@ -116,6 +117,16 @@ export function PartnerPraticaDetail() {
           </button>
           <span className="text-gray-500 h-4">{saving ? 'Salvataggio...' : saved ? 'Salvato ✓' : null}</span>
         </div>
+
+        {value.pratica_finale_enea_path && value.pratica_finale_ricevuta_path && value.pratica_finale_dichiarazione_path && (
+          <PraticaFinaleDownload
+            paths={{
+              enea: value.pratica_finale_enea_path,
+              ricevuta: value.pratica_finale_ricevuta_path,
+              dichiarazione: value.pratica_finale_dichiarazione_path,
+            }}
+          />
+        )}
 
         {id && <FileManager praticaId={id} />}
 

@@ -19,7 +19,8 @@ export function FileManager({ praticaId }: { praticaId: string }) {
     const { data, error } = await supabase.storage.from('fatture').list(praticaId, {
       sortBy: { column: 'created_at', order: 'desc' },
     })
-    if (!error) setFiles((data ?? []) as unknown as FileRow[])
+    // Supabase lists subfolders (e.g. "pratica-finale/") as entries with id: null — exclude them, they aren't real files
+    if (!error) setFiles(((data ?? []) as unknown as FileRow[]).filter((f) => f.id))
     setLoading(false)
   }
 
