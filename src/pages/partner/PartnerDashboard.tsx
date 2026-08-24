@@ -23,7 +23,6 @@ type Row = Pick<
 export function PartnerDashboard() {
   const [pratiche, setPratiche] = useState<Row[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     supabase
@@ -39,23 +38,11 @@ export function PartnerDashboard() {
       })
   }, [])
 
-  async function handleElimina(praticaId: string, nomeCliente: string) {
-    if (!window.confirm(`Eliminare ${nomeCliente || 'questo cliente'}? L'operazione non è reversibile.`)) return
-    const { error } = await supabase.from('pratiche').delete().eq('id', praticaId)
-    if (error) {
-      setError(error.message)
-      return
-    }
-    setPratiche((rows) => rows.filter((r) => r.id !== praticaId))
-  }
-
   return (
     <div>
       <TopBar title="Pratiche ENEA — Area partner" />
       <div className="p-6 space-y-4">
         <h2 className="text-lg font-semibold">Le tue pratiche</h2>
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
 
         {loading ? (
           <p className="text-sm text-gray-500">Caricamento...</p>
@@ -69,7 +56,6 @@ export function PartnerDashboard() {
                 <th className="py-2 pr-4">Cliente</th>
                 <th className="py-2 pr-4">Stato</th>
                 <th className="py-2 pr-4">Creata il</th>
-                <th className="py-2 pr-4"></th>
               </tr>
             </thead>
             <tbody>
@@ -89,14 +75,6 @@ export function PartnerDashboard() {
                     </td>
                     <td className="py-2 pr-4">{STATO_LABELS[p.stato]}</td>
                     <td className="py-2 pr-4">{new Date(p.created_at).toLocaleDateString('it-IT')}</td>
-                    <td className="py-2 pr-4">
-                      <button
-                        onClick={() => handleElimina(p.id, `${p.cognome ?? ''} ${p.nome ?? ''}`.trim())}
-                        className="text-xs text-red-600 hover:underline"
-                      >
-                        Elimina
-                      </button>
-                    </td>
                   </tr>
                 )
               })}
