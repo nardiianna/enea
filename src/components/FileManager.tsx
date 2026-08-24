@@ -19,8 +19,9 @@ export function FileManager({ praticaId }: { praticaId: string }) {
     const { data, error } = await supabase.storage.from('fatture').list(praticaId, {
       sortBy: { column: 'created_at', order: 'desc' },
     })
-    // Supabase lists subfolders (e.g. "pratica-finale/") as entries with id: null — exclude them, they aren't real files
-    if (!error) setFiles(((data ?? []) as unknown as FileRow[]).filter((f) => f.id))
+    // "pratica-finale" is a reserved subfolder (see PraticaFinaleUpload) that storage.list() surfaces
+    // as a pseudo-entry alongside real files — exclude it, it isn't a downloadable file itself.
+    if (!error) setFiles(((data ?? []) as unknown as FileRow[]).filter((f) => f.name !== 'pratica-finale'))
     setLoading(false)
   }
 
