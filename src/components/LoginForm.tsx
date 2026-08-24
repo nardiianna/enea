@@ -29,7 +29,7 @@ export function LoginForm({ title, redirectTo }: { title: string; redirectTo: st
         <Link to="/" className="inline-block text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
           ← Indietro
         </Link>
-        <img src={logo} alt="Pratiche ENEA — Nardi" className="mx-auto w-48" />
+        <img src={logo} alt="Pratiche ENEA — Nardi" className="mx-auto w-72" />
         <h1 className="text-lg font-semibold text-center">{title}</h1>
         <input
           type="email"
