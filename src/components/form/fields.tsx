@@ -45,10 +45,18 @@ export function NumberInput({
       {label}
       <input
         type="number"
+        step={1}
         className={inputCls}
         value={value ?? ''}
         disabled={disabled}
-        onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
+        onChange={(e) => {
+          if (e.target.value === '') {
+            onChange(null)
+            return
+          }
+          const n = Number(e.target.value)
+          if (!Number.isNaN(n)) onChange(Math.trunc(n))
+        }}
       />
     </label>
   )

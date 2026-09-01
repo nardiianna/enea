@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { sanitizeFileName } from '../lib/sanitizeFileName'
 
 interface FileRow {
   name: string
@@ -34,7 +35,7 @@ export function FileManager({ praticaId }: { praticaId: string }) {
     setUploading(true)
     setError(null)
     for (const file of Array.from(fileList)) {
-      const path = `${praticaId}/${Date.now()}-${file.name}`
+      const path = `${praticaId}/${Date.now()}-${sanitizeFileName(file.name)}`
       const { error } = await supabase.storage.from('fatture').upload(path, file)
       if (error) setError(error.message)
     }
@@ -44,7 +45,12 @@ export function FileManager({ praticaId }: { praticaId: string }) {
   }
 
   async function handleDelete(name: string) {
-    await supabase.storage.from('fatture').remove([`${praticaId}/${name}`])
+    setError(null)
+    const { error } = await supabase.storage.from('fatture').remove([`${praticaId}/${name}`])
+    if (error) {
+      setError(error.message)
+      return
+    }
     loadFiles()
   }
 

@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { sanitizeFileName } from '../lib/sanitizeFileName'
 
 export type PraticaFinaleSlotKey = 'enea' | 'ricevuta' | 'dichiarazione'
 
@@ -52,7 +53,7 @@ function FinalDocSlot({ praticaId, slotKey, path, onChange }: SlotProps) {
     if (!file) return
     setUploading(true)
     setError(null)
-    const newPath = `${praticaId}/pratica-finale/${slotKey}/${Date.now()}-${file.name}`
+    const newPath = `${praticaId}/pratica-finale/${slotKey}/${Date.now()}-${sanitizeFileName(file.name)}`
     const { error: uploadError } = await supabase.storage.from('fatture').upload(newPath, file)
     if (uploadError) {
       setError(uploadError.message)
