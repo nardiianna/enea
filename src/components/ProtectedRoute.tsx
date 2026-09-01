@@ -12,14 +12,16 @@ export function ProtectedRoute({
   children: ReactNode
 }) {
   const { session, profile, loading } = useAuth()
+  const noProfile = !loading && !!session && !profile
   const wrongAccount = !loading && !!session && !!profile && profile.role !== role
+  const denied = noProfile || wrongAccount
 
   useEffect(() => {
-    if (wrongAccount) supabase.auth.signOut()
-  }, [wrongAccount])
+    if (denied) supabase.auth.signOut()
+  }, [denied])
 
   if (loading) return <div className="p-8 text-center text-gray-500">Caricamento...</div>
   if (!session) return <Navigate to={`/${role}/login`} replace />
-  if (wrongAccount) return <div className="p-8 text-center text-gray-500">Reindirizzamento al login...</div>
+  if (denied) return <div className="p-8 text-center text-gray-500">Reindirizzamento al login...</div>
   return <>{children}</>
 }

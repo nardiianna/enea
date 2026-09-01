@@ -14,7 +14,7 @@ const SLOT_ORDER: PraticaFinaleSlotKey[] = ['enea', 'ricevuta', 'dichiarazione']
 interface Props {
   praticaId: string
   paths: Partial<Record<PraticaFinaleSlotKey, string | null>>
-  onChange: (key: PraticaFinaleSlotKey, path: string | null) => void
+  onChange: (key: PraticaFinaleSlotKey, path: string | null) => Promise<void>
 }
 
 export function PraticaFinaleUpload({ praticaId, paths, onChange }: Props) {
@@ -38,7 +38,7 @@ interface SlotProps {
   praticaId: string
   slotKey: PraticaFinaleSlotKey
   path: string | null
-  onChange: (path: string | null) => void
+  onChange: (path: string | null) => Promise<void>
 }
 
 function FinalDocSlot({ praticaId, slotKey, path, onChange }: SlotProps) {
@@ -59,16 +59,29 @@ function FinalDocSlot({ praticaId, slotKey, path, onChange }: SlotProps) {
       setUploading(false)
       return
     }
+    try {
+      await onChange(newPath)
+    } catch (err) {
+      await supabase.storage.from('fatture').remove([newPath])
+      setError(err instanceof Error ? err.message : 'Errore durante il salvataggio')
+      setUploading(false)
+      return
+    }
     if (path) await supabase.storage.from('fatture').remove([path])
-    onChange(newPath)
     setUploading(false)
     if (inputRef.current) inputRef.current.value = ''
   }
 
   async function handleRemove() {
     if (!path) return
+    setError(null)
+    try {
+      await onChange(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Errore durante la rimozione')
+      return
+    }
     await supabase.storage.from('fatture').remove([path])
-    onChange(null)
   }
 
   async function handleDownload() {

@@ -95,6 +95,14 @@ export function PraticaDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
+  async function saveFinalDocPath(key: PraticaFinaleSlotKey, path: string | null) {
+    if (!id) return
+    const field = FIELD_BY_SLOT[key]
+    const { error } = await supabase.from('pratiche').update({ [field]: path }).eq('id', id)
+    if (error) throw error
+    setValue((v) => ({ ...v, [field]: path }))
+  }
+
   async function handleCreaPratica() {
     setSaving(true)
     setError(null)
@@ -182,7 +190,7 @@ export function PraticaDetail() {
               ricevuta: value.pratica_finale_ricevuta_path,
               dichiarazione: value.pratica_finale_dichiarazione_path,
             }}
-            onChange={(key, path) => setValue((v) => ({ ...v, [FIELD_BY_SLOT[key]]: path }))}
+            onChange={saveFinalDocPath}
           />
         )}
 
